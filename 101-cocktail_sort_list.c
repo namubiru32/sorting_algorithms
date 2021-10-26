@@ -1,90 +1,74 @@
 #include "sort.h"
-
 /**
- * cocktail_sort_list - sort a list using
- * cocktail_sort algorithm
- * @list: pointer to the list head
- * Return: void
+ * swap - swaps both
+ * @p: first node to swap
+ * @c: second node to swap
+ * @list: list to set null or not
  */
-
-void cocktail_sort_list(listint_t **list)
+void swap(listint_t *p, listint_t *c, listint_t **list)
 {
-	listint_t *start, *end, *current, *new_head;
-	int swapped = 1, i = 0, j, e = 0;
-
-	if (!list || !(*list) || !(*list)->next)
-		return;
-	start = *list, current = start;
-	while (swapped == 1)
+	if (!(p->prev))
 	{
-		swapped = 0;
-		while (current && current->next)
-		{
-			if (current->n > current->next->n)
-			{
-				end = current, current = current->next;
-				new_head = swap_nodes(current->prev, current, *list), swapped = 1;
-				if (new_head != NULL)
-					*list = new_head, start = *list;
-			} else
-				current = current->next, end = current;
-		}
-		if (swapped == 0)
-			break;
-		for (j = 0; j < i; j++)
-			start = start->next;
-		swapped = 0, e++;
-		while (end && end->next != NULL)
-			end = end->next;
-		for (j = 0; j < e; j++)
-			end = end->prev;
-		current = end;
-		while (current && current->prev && current != start->prev)
-		{
-			if (current->n > current->next->n)
-			{
-				new_head = swap_nodes(current, current->next, *list), swapped = 1;
-			}
-			current = current->prev;
-		}
-		i++, start = start->next;
+		p->next = c->next;
+		if (c->next)
+			c->next->prev = p;
+		c->next = p;
+		c->prev = NULL;
+		p->prev = c;
+		*list = c;
+	}
+	else
+	{
+		c->prev->next = c->next;
+		if (c->next)
+			c->next->prev = c->prev;
+		p->prev->next = c;
+		c->prev = p->prev;
+		p->prev = c;
+		c->next = p;
 	}
 }
 
-
-
 /**
- * *swap_nodes - swaps two nodes
- * @n: node 1
- * @b: node 2
- * @head: head of the list
- * Return: pointer to head if changed or NULL
+ * cocktail_sort_list - inserts right unsorted side into left sorted side
+ * @list: doubly linked list to sort
  */
-
-listint_t *swap_nodes(listint_t *n, listint_t *b, listint_t *head)
+void cocktail_sort_list(listint_t **list)
 {
-	listint_t *tmp;
+	listint_t *c, *nextnode;
+	int swapped;
 
-	tmp = n->next;
-	tmp->prev = b;
-	n->next = b->next;
-	b->next = tmp;
-	if (n->next != NULL)
-		n->next->prev = n;
+	if (list == NULL || !(*list) || (*list)->next == NULL)
+		return;
 
-	tmp = n->prev;
-	if (tmp != NULL)
-	{
-		n->prev = b->prev;
-		n->prev->next = n;
-		b->prev = tmp;
-		b->prev->next = b;
-		print_list(head);
-		return (NULL);
-	}
-	n->prev = b->prev;
-	n->prev->next = n;
-	b->prev = tmp;
-	print_list(b);
-	return (b);
+	c = (*list);
+	do {
+		swapped = 0;
+		while (c->next)
+		{
+			nextnode = c->next;
+			if (nextnode && c->n > nextnode->n)
+			{
+				swap(c, nextnode, list);
+				swapped = 1;
+				print_list((*list));
+			}
+			else
+				c = c->next;
+		}
+		c = c->prev;
+		while (c->prev)
+		{
+			nextnode = c->prev;
+			if (nextnode && c->n < nextnode->n)
+			{
+				swap(nextnode, c, list);
+				swapped = 1;
+				print_list((*list));
+			}
+			else
+				c = c->prev;
+		}
+		c = c->next;
+	} while (swapped);
 }
