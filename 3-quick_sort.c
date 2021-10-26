@@ -82,4 +82,3 @@ int partition(int *arr, int low, int high, size_t size)
 
 	return (high);
 }
-
